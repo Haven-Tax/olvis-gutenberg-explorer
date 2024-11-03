@@ -52,47 +52,46 @@ const PageUI = () => {
     router.push("/");
   };
 
-  useEffect(() => {
-    const handleSearch = async (id: string) => {
-      setLoading(true);
-      const { data, error } = await fetchNewBook(id);
+  const handleSearch = React.useCallback(async (id: string) => {
+    setLoading(true);
+    const { data, error } = await fetchNewBook(id);
 
-      if (error || !data) {
-        toast({
-          description: error,
-          variant: "destructive",
-        });
-        router.push("/");
-        setLoading(false);
-        return;
-      }
-      console.log("data", data);  
+    if (error || !data) {
+      toast({
+        description: error,
+        variant: "destructive",
+      });
+      router.push("/");
       setLoading(false);
-      setBook(data);
-    };
-
-    const handleLoadBook = async (id: string) => {
-      setLoading(true);
-      const { data, error } = await fetchExistingBook(id);
-      setLoading(false);
-
-      if (error || !data) {
-        toast({
-          description: error,
-          variant: "destructive",
-        });
-        router.push("/");
-        return;
-      }
-      setBook(data);
+      return;
     }
+    setLoading(false);
+    setBook(data);
+  }, [router]);
 
+  const loadExistingBook = React.useCallback(async (id: string) => {
+    setLoading(true);
+    const { data, error } = await fetchExistingBook(id);
+    setLoading(false);
+
+    if (error || !data) {
+      toast({
+        description: error,
+        variant: "destructive",
+      });
+      router.push("/");
+      return;
+    }
+    setBook(data);
+  }, [router]); 
+
+  useEffect(() => {
     if (isReadOnly) {
-      handleLoadBook(itemId);
+      loadExistingBook(itemId);
     } else if (bookId) {
       handleSearch(bookId);
     }
-  }, [bookId, itemId, router, isReadOnly]);
+  }, [isReadOnly, itemId, bookId, handleSearch, loadExistingBook]);
 
   return (
     <div className="flex flex-col gap-20 items-center py-16 max-w-5xl mx-auto px-10">

@@ -36,8 +36,10 @@ export default function Home() {
         description: error,
         variant: "destructive",
       });
+      setBooks([]);
+      return;
     }
-    setBooks(data || []);
+    setBooks(data ?? []);
   };
 
   useEffect(() => {
